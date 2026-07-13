@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>NIC Academy — Student Activity Management</title>
+<style>
+  :root{
+    --green:#1b8a5a; --green-dark:#136b45; --blue:#1565c0; --blue-dark:#0d47a1;
+    --bg:#f2f6f4; --card:#ffffff; --text:#1f2a24; --muted:#6b7a72; --border:#e1e8e4;
+    --danger:#d0422a; --warn:#e0a51e; --radius:12px;
+  }
+  [data-theme="dark"]{ --bg:#101613; --card:#182019; --text:#e7efe9; --muted:#9db0a6; --border:#2a352e; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;max-width:100%;overflow-x:hidden;}
+  body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  a{color:inherit;}
+  .hidden{display:none !important;}
+  img.logo{height:44px;width:44px;object-fit:contain;border-radius:8px;background:#fff;padding:2px;flex-shrink:0;}
+
+  /* ---------- Brand header (shared) ---------- */
+  .brand-header{display:flex;align-items:center;gap:10px;padding:10px 12px;
+    background:linear-gradient(90deg,var(--green),var(--blue));color:#fff;min-width:0;}
+  .brand-header .brand-text{line-height:1.25;min-width:0;overflow:hidden;}
+  .brand-header .brand-text b{font-size:15px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .brand-header .brand-text span{font-size:11px;opacity:.9;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .print-header{display:none;}
+  .app-sticky{position:sticky;top:0;z-index:30;}
+
+  /* ---------- Login ---------- */
+  #loginScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--green),var(--blue));padding:16px;gap:16px;}
+  .login-card{background:var(--card);width:360px;max-width:100%;border-radius:var(--radius);
+    padding:26px;box-shadow:0 10px 40px rgba(0,0,0,.25);}
+  .login-card h1{font-size:19px;margin:0 0 4px;text-align:center;}
+  .login-card p.sub{text-align:center;color:var(--muted);margin:0 0 18px;font-size:13px;}
+  .role-tabs{display:flex;background:var(--bg);border-radius:8px;padding:4px;margin-bottom:16px;}
+  .role-tabs button{flex:1;border:none;background:transparent;padding:10px;border-radius:6px;cursor:pointer;font-weight:600;color:var(--muted);min-height:44px;}
+  .role-tabs button.active{background:var(--green);color:#fff;}
+  input,select,textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;
+    margin-bottom:12px;background:var(--card);color:var(--text);font-size:15px;min-height:44px;}
+  textarea{min-height:70px;}
+  label{font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;}
+  .btn{border:none;border-radius:8px;padding:11px 16px;font-weight:600;cursor:pointer;font-size:14px;min-height:44px;}
+  .btn-primary{background:var(--green);color:#fff;width:100%;}
+  .btn-primary:hover{background:var(--green-dark);}
+  .btn-blue{background:var(--blue);color:#fff;}
+  .btn-blue:hover{background:var(--blue-dark);}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .btn-danger{background:var(--danger);color:#fff;}
+  .btn-sm{padding:7px 10px;font-size:12px;min-height:36px;}
+  #loginMsg{color:var(--danger);font-size:13px;text-align:center;margin-top:6px;min-height:16px;}
+
+  /* ---------- App shell ---------- */
+  header.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap;}
+  header.topbar .brand-header{flex:1;min-width:0;padding-right:0;}
+  header.topbar .userinfo{font-size:12px;opacity:.9;white-space:nowrap;}
+  header.topbar .actions{display:flex;align-items:center;gap:6px;flex-shrink:0;padding:8px 10px 8px 0;}
+  nav.tabs{display:flex;gap:4px;background:var(--card);padding:6px 10px;overflow-x:auto;border-bottom:1px solid var(--border);
+    -webkit-overflow-scrolling:touch;}
+  nav.tabs button{white-space:nowrap;background:transparent;border:none;padding:10px 14px;border-radius:8px;
+    cursor:pointer;font-weight:600;color:var(--muted);font-size:13px;min-height:40px;}
+  nav.tabs button.active{background:var(--green);color:#fff;}
+  main{padding:14px;max-width:1200px;margin:0 auto;width:100%;}
+  @media(max-width:560px){
+    header.topbar .brand-header .brand-text span{display:none;} /* hide address on very small screens, keep name */
+    header.topbar .userinfo{display:none;} /* hide "Name (role)" text, keep icon buttons visible */
+    .toggle-theme{padding:8px;min-width:40px;}
+  }
+  .grid{display:grid;gap:12px;}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(2,1fr);} .grid-2{grid-template-columns:1fr;}}
+  @media(max-width:520px){.grid-4{grid-template-columns:1fr;}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;}
+  .stat-card .num{font-size:24px;font-weight:700;}
+  .stat-card .lbl{color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+  .section-title{font-size:15px;font-weight:700;margin:16px 0 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-size:11px;text-transform:uppercase;}
+  tr:hover td{background:rgba(27,138,90,.05);}
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .toolbar input,.toolbar select{width:auto;margin-bottom:0;min-width:140px;flex:1;}
+  .badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+  .badge-green{background:#d9f2e4;color:var(--green-dark);}
+  .badge-red{background:#fbdedb;color:var(--danger);}
+  .badge-yellow{background:#fdf0d0;color:#8a6111;}
+  [data-theme="dark"] .badge-green{background:#12351f;} [data-theme="dark"] .badge-red{background:#3a1712;} [data-theme="dark"] .badge-yellow{background:#3a2c0d;}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:50;padding:12px;}
+  .modal{background:var(--card);border-radius:var(--radius);padding:18px;width:520px;max-width:100%;max-height:92vh;overflow:auto;}
+  .modal h3{margin-top:0;}
+  .close-x{float:right;cursor:pointer;font-size:22px;color:var(--muted);padding:4px 8px;}
+  .footer-note{text-align:center;color:var(--muted);font-size:12px;padding:20px;}
+  .toggle-theme{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;min-height:40px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:520px){.form-row{grid-template-columns:1fr;}}
+  .empty{color:var(--muted);text-align:center;padding:26px;font-size:13px;}
+  .link-box{display:flex;gap:6px;align-items:center;background:var(--bg);padding:8px;border-radius:8px;font-size:12px;word-break:break-all;}
+
+  /* ---------- Dynamic activity rows ---------- */
+  .act-row{display:grid;grid-template-columns:1.2fr 1fr 0.9fr 0.9fr auto;gap:6px;margin-bottom:8px;align-items:center;}
+  @media(max-width:700px){.act-row{grid-template-columns:1fr 1fr;}}
+  .act-row select,.act-row input{margin-bottom:0;}
+  .act-row .rm-btn{background:var(--danger);color:#fff;border:none;border-radius:8px;padding:0 12px;min-height:44px;cursor:pointer;font-weight:700;}
+  @media(max-width:700px){.act-row .rm-btn{grid-column:span 2;}}
+
+  /* ---------- Parent portal (no login) ---------- */
+  .parent-wrap{max-width:820px;margin:0 auto;padding:14px;}
+  .parent-hero{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;}
+  .parent-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  /* ---------- Print ---------- */
+  @media print{
+    body{background:#fff;}
+    header.topbar, nav.tabs, .toggle-theme, .parent-actions, .toolbar button, .no-print{display:none !important;}
+    .print-header{display:flex !important;align-items:center;gap:12px;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:14px;}
+    .print-header .brand-text b{font-size:16px;color:#000;}
+    .print-header .brand-text span{font-size:11px;color:#333;}
+    .card{border:1px solid #ccc;box-shadow:none;}
+    main{padding:0;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen">
+  <div class="brand-header" style="border-radius:12px;max-width:360px;width:100%;">
+    <img class="logo" src="logo.jpg" alt="Logo" onerror="this.style.display='none'">
+    <div class="brand-text"><b id="loginInstName">NIC ACADMEY</b><span id="loginInstAddr"></span></div>
+  </div>
+  <div class="login-card">
+    <h1>📚 Student Activity Management</h1>
+    <p class="sub">Sign in to continue</p>
+    <div class="role-tabs">
+      <button id="tabAdmin" class="active" onclick="setLoginRole('admin')">Admin</button>
+      <button id="tabTeacher" onclick="setLoginRole('teacher')">Teacher</button>
+    </div>
+    <label>Username</label>
+    <input id="loginUser" placeholder="Username">
+    <label>Password</label>
+    <input id="loginPass" type="password" placeholder="Password">
+    <button class="btn btn-primary" onclick="doLogin()">Login</button>
+    <div id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="appScreen" class="hidden">
+  <div class="app-sticky">
+    <header class="topbar">
+      <div class="brand-header">
+        <img class="logo" src="logo.jpg" alt="Logo" onerror="this.style.display='none'">
+        <div class="brand-text"><b id="instituteNameLbl">Tutorial Institute</b><span id="instituteAddrLbl"></span></div>
+      </div>
+      <div class="actions">
+        <span class="userinfo" id="userInfoLbl"></span>
+        <button class="toggle-theme" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+        <button class="toggle-theme" onclick="logout()" title="Logout">🚪 Logout</button>
+      </div>
+    </header>
+    <nav class="tabs" id="navTabs"></nav>
+  </div>
+  <main id="mainContent"></main>
+  <div class="footer-note">Tutorial Student Activity Management System</div>
+</div>
+
+<!-- ================= PARENT PORTAL (standalone, no login) ================= -->
+<div id="parentScreen" class="hidden">
+  <header class="brand-header">
+    <img class="logo" src="logo.jpg" alt="Logo" onerror="this.style.display='none'">
+    <div class="brand-text"><b id="parentInstName">Tutorial Institute</b><span id="parentInstAddr"></span></div>
+  </header>
+  <div class="print-header">
+    <img class="logo" src="logo.jpg" alt="Logo" onerror="this.style.display='none'">
+    <div class="brand-text"><b id="printInstName">Tutorial Institute</b><span id="printInstAddr"></span><span id="printInstPhone"></span></div>
+  </div>
+  <div class="parent-wrap" id="parentContent"></div>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+/* ===================== GLOBAL STATE ===================== */
+var STATE = { role:null, name:null, teacherId:null, classes:[], batches:[] };
+var CACHE = { students:null, teachers:null, config:null };
+var INITIAL_STUDENT_ID = new URLSearchParams(location.search).get('studentId')
+  || new URLSearchParams(location.search).get('studentid') || '';
+
+/* ===================== CONFIG ===================== */
+var API_URL = 'https://script.google.com/macros/s/AKfycbxiscpdH_JapZlcucgFspkyxVrgxF0wABOTTP-UIAvaEvhB95QIIxWg2auAMUcF6iRlmg/exec';
+
+/* ===================== fetch-based API client ===================== */
+function callApi(action, payload){
+  payload = payload || {};
+  payload.action = action;
+  return fetch(API_URL, {
+    method:'POST',
+    headers:{ 'Content-Type':'text/plain;charset=utf-8' }, // avoids CORS pre-flight
+    body: JSON.stringify(payload)
+  }).then(function(r){ return r.json(); });
+}
+var api = {
+  loginAdmin: function(u,p){ return callApi('loginAdmin', {username:u, password:p}); },
+  loginTeacher: function(u,p){ return callApi('loginTeacher', {username:u, password:p}); },
+  getStudents: function(){ return callApi('getStudents'); },
+  saveStudent: function(data){ return callApi('saveStudent', {data:data}); },
+  deleteStudent: function(id){ return callApi('deleteStudent', {studentId:id}); },
+  getTeachers: function(){ return callApi('getTeachers'); },
+  saveTeacher: function(data){ return callApi('saveTeacher', {data:data}); },
+  deleteTeacher: function(id){ return callApi('deleteTeacher', {teacherId:id}); },
+  getConfig: function(){ return callApi('getConfig'); },
+  saveDailyEntry: function(data, actor){ return callApi('saveDailyEntry', {data:data, actor:actor}); },
+  deleteEntry: function(entryId, actor){ return callApi('deleteEntry', {entryId:entryId, actor:actor}); },
+  getEntriesForDate: function(date){ return callApi('getEntriesForDate', {date:date}); },
+  getStudentProfile: function(id){ return callApi('getStudentProfile', {studentId:id}); },
+  getDashboardData: function(){ return callApi('getDashboardData'); },
+  getReportData: function(filters){ return callApi('getReportData', {filters:filters}); },
+  saveHoliday: function(data, actor){ return callApi('saveHoliday', {data:data, actor:actor}); },
+  deleteHoliday: function(date){ return callApi('deleteHoliday', {date:date}); },
+  getHolidays: function(filters){ return callApi('getHolidays', {filters:filters}); }
+};
+// simple in-memory cache to cut down on repeated API calls (performance)
+function cached(key, fetcher, force){
+  if (!force && CACHE[key]) return Promise.resolve(CACHE[key]);
+  return fetcher().then(function(data){ CACHE[key] = data; return data; });
+}
+function invalidate(key){ CACHE[key] = null; }
+
+/* ===================== INIT ===================== */
+window.addEventListener('DOMContentLoaded', function(){
+  if (localStorage.getItem('tsams_theme') === 'dark') document.documentElement.setAttribute('data-theme','dark');
+  applyBrandingEverywhere(); // shows sane defaults immediately, refined once config loads
+  if (INITIAL_STUDENT_ID) { loadParentPortal(INITIAL_STUDENT_ID); return; }
+  var saved = localStorage.getItem('tsams_session');
+  if (saved) { STATE = JSON.parse(saved); enterApp(); }
+});
+window.addEventListener('pageshow', function(e){
+  // survive back/forward cache without forcing a fresh login
+  if (e.persisted && !INITIAL_STUDENT_ID) {
+    var saved = localStorage.getItem('tsams_session');
+    if (saved && document.getElementById('appScreen').classList.contains('hidden')) {
+      STATE = JSON.parse(saved); enterApp();
+    }
+  }
+});
+
+function toggleTheme(){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (isDark){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('tsams_theme','light'); }
+  else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('tsams_theme','dark'); }
+}
+function applyBrandingEverywhere(cfg){
+  cfg = cfg || { instituteName:'NIC ACADMEY', address:'', phone:'' };
+  ['loginInstName','instituteNameLbl','parentInstName','printInstName'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.textContent = cfg.instituteName;
+  });
+  ['loginInstAddr','instituteAddrLbl','parentInstAddr','printInstAddr'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.textContent = cfg.address;
+  });
+  var phoneEl = document.getElementById('printInstPhone');
+  if (phoneEl) phoneEl.textContent = cfg.phone ? ('Ph: ' + cfg.phone) : '';
+}
+
+/* ===================== LOGIN ===================== */
+var loginRole = 'admin';
+function setLoginRole(r){
+  loginRole = r;
+  document.getElementById('tabAdmin').classList.toggle('active', r==='admin');
+  document.getElementById('tabTeacher').classList.toggle('active', r==='teacher');
+}
+function doLogin(){
+  var u = document.getElementById('loginUser').value.trim();
+  var p = document.getElementById('loginPass').value;
+  var msg = document.getElementById('loginMsg');
+  msg.textContent = '';
+  if (!u || !p){ msg.textContent = 'Enter username and password'; return; }
+  var call = loginRole === 'admin' ? api.loginAdmin(u,p) : api.loginTeacher(u,p);
+  call.then(function(res){
+    if (!res.success){ msg.textContent = res.message || 'Login failed'; return; }
+    STATE = { role:res.role, name:res.name, teacherId:res.teacherId || null };
+    localStorage.setItem('tsams_session', JSON.stringify(STATE));
+    enterApp();
+  }).catch(function(e){ msg.textContent = 'Error: ' + e; });
+}
+function logout(){
+  localStorage.removeItem('tsams_session');
+  location.href = location.href.split('?')[0];
+}
+function actor(){ return { role: STATE.role, teacherId: STATE.teacherId, name: STATE.name }; }
+
+/* ===================== APP SHELL ===================== */
+function enterApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('userInfoLbl').textContent = STATE.name + ' (' + STATE.role + ')';
+  cached('config', api.getConfig).then(function(cfg){
+    STATE.classes = cfg.classes; STATE.batches = cfg.batches;
+    applyBrandingEverywhere(cfg);
+    buildNav();
+  });
+}
+function buildNav(){
+  var tabs = STATE.role === 'admin'
+    ? [['dashboard','Dashboard'],['students','Students'],['teachers','Teachers'],['reports','Reports']]
+    : [['dashboard','Dashboard'],['entry','Daily Entry'],['reports','My Reports']];
+  var nav = document.getElementById('navTabs');
+  nav.innerHTML = tabs.map(function(t,i){
+    return '<button data-tab="'+t[0]+'" onclick="goTab(\''+t[0]+'\')" class="'+(i===0?'active':'')+'">'+t[1]+'</button>';
+  }).join('');
+  goTab(tabs[0][0]);
+}
+function goTab(tab){
+  document.querySelectorAll('#navTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.tab===tab); });
+  var m = { dashboard:renderDashboard, students:renderStudents, teachers:renderTeachers, entry:renderEntry, reports:renderReports };
+  (m[tab] || renderDashboard)();
+}
+
+/* ===================== DASHBOARD ===================== */
+function renderDashboard(){
+  var main = document.getElementById('mainContent');
+  main.innerHTML = '<div class="empty">Loading dashboard…</div>';
+  api.getDashboardData().then(function(d){
+    var html = '';
+    if (d.holidayToday) {
+      html += '<div class="card" style="background:#fdf0d0;border-color:#e0a51e;margin-bottom:12px;"><b>🏖️ Today is a Holiday:</b> '+d.holidayToday+'</div>';
+    }
+    html += '<div class="grid grid-4">'
+      + statCard(d.totalStudents,'Active Students')
+      + statCard(d.present,'Present Today','green')
+      + statCard(d.absent,'Absent Today','red')
+      + statCard(d.pendingHomework,'Pending Homework','yellow')
+      + '</div>';
+    html += '<div class="section-title">📅 ' + d.today + '</div><div class="grid grid-2">';
+    html += '<div class="card"><b>🎂 Upcoming Birthdays (7 days)</b><div class="table-wrap">'
+      + (d.birthdays.length ? tableize(d.birthdays,['name','class','dob'],['Name','Class','DOB']) : '<div class="empty">None</div>') + '</div></div>';
+    html += '<div class="card"><b>⚠️ Low Attendance (&lt;75%)</b><div class="table-wrap">'
+      + (d.lowAttendance.length ? tableize(d.lowAttendance,['name','pct'],['Name','Attendance %']) : '<div class="empty">None</div>') + '</div></div>';
+    html += '</div>';
+    html += '<div class="card" style="margin-top:14px;"><b>🕒 Recent Activities</b><div class="table-wrap">'
+      + (d.recentActivities.length ? tableize(d.recentActivities,['date','student','activities','note'],['Date','Student','Activities','Note']) : '<div class="empty">No recent activity</div>') + '</div></div>';
+    main.innerHTML = html;
+  });
+}
+function statCard(num,lbl){ return '<div class="card stat-card"><div class="num">'+num+'</div><div class="lbl">'+lbl+'</div></div>'; }
+function tableize(rows, keys, labels){
+  var html = '<table><thead><tr>' + labels.map(function(l){return '<th>'+l+'</th>';}).join('') + '</tr></thead><tbody>';
+  rows.forEach(function(r){ html += '<tr>' + keys.map(function(k){ return '<td>'+(r[k]===undefined?'':r[k])+'</td>'; }).join('') + '</tr>'; });
+  return html + '</tbody></table>';
+}
+
+/* ===================== STUDENTS (admin) ===================== */
+function renderStudents(force){
+  var main = document.getElementById('mainContent');
+  main.innerHTML = '<div class="empty">Loading students…</div>';
+  cached('students', api.getStudents, force).then(drawStudentsTable);
+}
+var studentSearchTimer = null;
+function drawStudentsTable(list){
+  var main = document.getElementById('mainContent');
+  var html = '<div class="toolbar">'
+    + '<input id="stuSearch" placeholder="Search name / ID / class" oninput="debounceFilterStudents()">'
+    + '<button class="btn btn-primary" style="width:auto;" onclick="openStudentModal()">+ Add Student</button>'
+    + '<button class="btn btn-outline" onclick="exportCSV(CACHE.students, \'students\')">Export CSV</button>'
+    + '</div>';
+  html += '<div class="table-wrap card"><table><thead><tr>'
+    + '<th>ID</th><th>Name</th><th>Class</th><th>Batch</th><th>Mobile</th><th>Status</th><th>Parent Link</th><th>Actions</th></tr></thead><tbody>';
+  list.forEach(function(s){
+    html += '<tr><td>'+s.StudentID+'</td><td>'+s.Name+'</td><td>'+s.Class+'</td><td>'+s.Batch+'</td><td>'+s.Mobile+'</td>'
+      + '<td><span class="badge '+(s.Status==='Active'?'badge-green':s.Status==='Left'?'badge-red':'badge-yellow')+'">'+s.Status+'</span></td>'
+      + '<td><div class="link-box"><span style="flex:1;">'+s.ParentLink+'</span><button class="btn btn-sm btn-outline" onclick="copyText(\''+s.ParentLink+'\')">Copy</button></div></td>'
+      + '<td><button class="btn btn-sm btn-blue" onclick="openStudentModal(\''+s.StudentID+'\')">Edit</button> '
+      + '<button class="btn btn-sm btn-danger" onclick="removeStudent(\''+s.StudentID+'\')">Del</button></td></tr>';
+  });
+  main.innerHTML = html + '</tbody></table></div>';
+}
+function debounceFilterStudents(){
+  clearTimeout(studentSearchTimer);
+  studentSearchTimer = setTimeout(filterStudents, 200);
+}
+function filterStudents(){
+  var q = document.getElementById('stuSearch').value.toLowerCase();
+  var filtered = CACHE.students.filter(function(s){ return (s.Name+s.StudentID+s.Class).toLowerCase().indexOf(q) > -1; });
+  var focusVal = q;
+  drawStudentsTable(filtered);
+  var input = document.getElementById('stuSearch');
+  input.value = focusVal; input.focus();
+  input.setSelectionRange(focusVal.length, focusVal.length);
+}
+function copyText(t){ navigator.clipboard.writeText(t); alert('Link copied!'); }
+function removeStudent(id){
+  if (!confirm('Delete this student?')) return;
+  api.deleteStudent(id).then(function(){ invalidate('students'); renderStudents(true); });
+}
+function openStudentModal(id){
+  var s = id ? CACHE.students.find(function(x){return x.StudentID===id;}) : {};
+  var classOpts = STATE.classes.map(function(c){return '<option '+(String(s.Class)===String(c)?'selected':'')+'>'+c+'</option>';}).join('');
+  var batchOpts = STATE.batches.map(function(b){return '<option '+(s.Batch===b?'selected':'')+'>'+b+'</option>';}).join('');
+  var html = '<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    + '<span class="close-x" onclick="closeModal()">&times;</span><h3>'+(id?'Edit':'Add')+' Student</h3>'
+    + '<div class="form-row"><div><label>Name</label><input id="f_Name" value="'+(s.Name||'')+'"></div>'
+    + '<div><label>Admission No.</label><input id="f_AdmissionNumber" value="'+(s.AdmissionNumber||'')+'"></div></div>'
+    + '<div class="form-row"><div><label>Father Name</label><input id="f_FatherName" value="'+(s.FatherName||'')+'"></div>'
+    + '<div><label>Mother Name</label><input id="f_MotherName" value="'+(s.MotherName||'')+'"></div></div>'
+    + '<div class="form-row"><div><label>Mobile</label><input id="f_Mobile" value="'+(s.Mobile||'')+'"></div>'
+    + '<div><label>Alt. Mobile</label><input id="f_AltMobile" value="'+(s.AltMobile||'')+'"></div></div>'
+    + '<div class="form-row"><div><label>Class</label><select id="f_Class">'+classOpts+'</select></div>'
+    + '<div><label>Batch</label><select id="f_Batch">'+batchOpts+'</select></div></div>'
+    + '<div class="form-row"><div><label>School</label><input id="f_School" value="'+(s.School||'')+'"></div>'
+    + '<div><label>Date of Birth</label><input id="f_DOB" type="date" value="'+(s.DOB?formatDateInput(s.DOB):'')+'"></div></div>'
+    + '<div class="form-row"><div><label>Joining Date</label><input id="f_JoiningDate" type="date" value="'+(s.JoiningDate?formatDateInput(s.JoiningDate):'')+'"></div>'
+    + '<div><label>Status</label><select id="f_Status"><option '+(s.Status==='Active'?'selected':'')+'>Active</option><option '+(s.Status==='Inactive'?'selected':'')+'>Inactive</option><option '+(s.Status==='Left'?'selected':'')+'>Left</option></select></div></div>'
+    + '<label>Address</label><textarea id="f_Address">'+(s.Address||'')+'</textarea>'
+    + '<label>Remarks</label><textarea id="f_Remarks">'+(s.Remarks||'')+'</textarea>'
+    + '<button class="btn btn-primary" onclick="submitStudent(\''+(id||'')+'\')">Save Student</button></div></div>';
+  document.getElementById('modalRoot').innerHTML = html;
+}
+function formatDateInput(v){ var d = new Date(v); return isNaN(d) ? '' : d.toISOString().substring(0,10); }
+function submitStudent(id){
+  var data = { StudentID:id||'', Name:val('f_Name'), AdmissionNumber:val('f_AdmissionNumber'),
+    FatherName:val('f_FatherName'), MotherName:val('f_MotherName'), Mobile:val('f_Mobile'),
+    AltMobile:val('f_AltMobile'), Class:val('f_Class'), Batch:val('f_Batch'), School:val('f_School'),
+    DOB:val('f_DOB'), JoiningDate:val('f_JoiningDate'), Status:val('f_Status'),
+    Address:val('f_Address'), Remarks:val('f_Remarks') };
+  if (!data.Name){ alert('Name is required'); return; }
+  api.saveStudent(data).then(function(){ closeModal(); invalidate('students'); renderStudents(true); });
+}
+function val(id){ return document.getElementById(id).value; }
+function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
+
+/* ===================== TEACHERS (admin) ===================== */
+function renderTeachers(force){
+  var main = document.getElementById('mainContent');
+  main.innerHTML = '<div class="empty">Loading teachers…</div>';
+  cached('teachers', api.getTeachers, force).then(function(list){
+    var html = '<div class="toolbar"><button class="btn btn-primary" style="width:auto;" onclick="openTeacherModal()">+ Add Teacher</button></div>';
+    html += '<div class="table-wrap card"><table><thead><tr><th>ID</th><th>Name</th><th>Username</th><th>Mobile</th><th>Subjects</th><th>Classes</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+    list.forEach(function(t){
+      html += '<tr><td>'+t.TeacherID+'</td><td>'+t.Name+'</td><td>'+t.Username+'</td><td>'+t.Mobile+'</td><td>'+t.Subjects+'</td><td>'+t.Classes+'</td>'
+        + '<td><span class="badge '+(t.Status==='Active'?'badge-green':'badge-red')+'">'+t.Status+'</span></td>'
+        + '<td><button class="btn btn-sm btn-blue" onclick="openTeacherModal(\''+t.TeacherID+'\')">Edit</button> '
+        + '<button class="btn btn-sm btn-danger" onclick="removeTeacher(\''+t.TeacherID+'\')">Del</button></td></tr>';
+    });
+    main.innerHTML = html + '</tbody></table></div>';
+  });
+}
+function removeTeacher(id){
+  if (!confirm('Delete this teacher?')) return;
+  api.deleteTeacher(id).then(function(){ invalidate('teachers'); renderTeachers(true); });
+}
+function openTeacherModal(id){
+  var t = id ? CACHE.teachers.find(function(x){return x.TeacherID===id;}) : {};
+  var html = '<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    + '<span class="close-x" onclick="closeModal()">&times;</span><h3>'+(id?'Edit':'Add')+' Teacher</h3>'
+    + '<label>Name</label><input id="t_Name" value="'+(t.Name||'')+'">'
+    + '<div class="form-row"><div><label>Username</label><input id="t_Username" value="'+(t.Username||'')+'"></div>'
+    + '<div><label>Password</label><input id="t_Password" value="'+(t.Password||'')+'"></div></div>'
+    + '<label>Mobile</label><input id="t_Mobile" value="'+(t.Mobile||'')+'">'
+    + '<label>Subjects (comma separated)</label><input id="t_Subjects" value="'+(t.Subjects||'')+'">'
+    + '<label>Classes (comma separated)</label><input id="t_Classes" value="'+(t.Classes||'')+'">'
+    + '<label>Status</label><select id="t_Status"><option '+(t.Status==='Active'?'selected':'')+'>Active</option><option '+(t.Status==='Inactive'?'selected':'')+'>Inactive</option></select>'
+    + '<button class="btn btn-primary" onclick="submitTeacher(\''+(id||'')+'\')">Save Teacher</button></div></div>';
+  document.getElementById('modalRoot').innerHTML = html;
+}
+function submitTeacher(id){
+  var data = { TeacherID:id||'', Name:val('t_Name'), Username:val('t_Username'), Password:val('t_Password'),
+    Mobile:val('t_Mobile'), Subjects:val('t_Subjects'), Classes:val('t_Classes'), Status:val('t_Status') };
+  if (!data.Name || !data.Username || !data.Password){ alert('Name, Username and Password are required'); return; }
+  api.saveTeacher(data).then(function(){ closeModal(); invalidate('teachers'); renderTeachers(true); });
+}
+
+/* ===================== DAILY ENTRY (dynamic activity rows) ===================== */
+var ACTIVITY_OPTIONS = ['Homework','Reading','Writing Practice','Worksheets','Doubt Clarification','Speaking Practice',
+  'Handwriting','Project Work','Computer Practice','Group Discussion','Oral Test','Assignment','Exam Preparation','Others'];
+var TIME_SUGGESTIONS = ['15 Minutes','30 Minutes','45 Minutes','1 Hour','2 Hour','More than 2 hours'];
+var actRowSeq = 0;
+// persists across tab switches within the session so Dashboard <-> Daily Entry keeps your place
+var entryState = { date:'', class:'', studentId:'' };
+
+function renderEntry(){
+  var main = document.getElementById('mainContent');
+  var today = entryState.date || new Date().toISOString().substring(0,10);
+  entryState.date = today;
+  cached('students', api.getStudents).then(function(list){
+    CACHE.studentsActive = list.filter(function(s){ return s.Status==='Active'; });
+    var classOpts = ['<option value="">All Classes</option>'].concat(STATE.classes.map(function(c){
+      return '<option '+(entryState.class===c?'selected':'')+'>'+c+'</option>';
+    })).join('');
+    main.innerHTML = '<div class="card">'
+      + '<div class="form-row">'
+      + '<div><label>Date</label><input type="date" id="e_Date" value="'+today+'" onchange="onEntryFiltersChange()"></div>'
+      + '<div><label>Class</label><select id="e_Class" onchange="onEntryFiltersChange()">'+classOpts+'</select></div></div>'
+      + '<label>Student</label><select id="e_Student" onchange="onEntryStudentChange()"></select>'
+      + '<div id="entryFormArea"></div>'
+      + '</div>'
+      + '<div class="section-title">🏖️ Holiday <button class="btn btn-sm btn-outline" onclick="openHolidayModal()">Mark / Remove Holiday</button></div>'
+      + '<div id="holidayBanner"></div>'
+      + '<div class="section-title">🗓️ Entries for Selected Date</div>'
+      + '<div id="dateEntriesArea" class="card"><div class="empty">Pick a date/class above</div></div>';
+    populateStudentDropdown();
+    loadDateEntriesList();
+    refreshHolidayBanner();
+  });
+}
+function onEntryFiltersChange(){
+  entryState.date = document.getElementById('e_Date').value;
+  entryState.class = document.getElementById('e_Class').value;
+  populateStudentDropdown();
+  loadDateEntriesList();
+  refreshHolidayBanner();
+}
+function onEntryStudentChange(){
+  entryState.studentId = document.getElementById('e_Student').value;
+  loadStudentEntry();
+}
+function populateStudentDropdown(){
+  var cls = document.getElementById('e_Class').value;
+  // String() coercion: Google Sheets silently stores pure-digit class names (e.g. "6") as
+  // a Number, so a strict === against the dropdown's string value would otherwise fail here.
+  var filtered = CACHE.studentsActive.filter(function(s){ return !cls || String(s.Class)===String(cls); });
+  var sel = document.getElementById('e_Student');
+  sel.innerHTML = '<option value="">-- Select Student to Add/Edit --</option>' + filtered.map(function(s){
+    return '<option value="'+s.StudentID+'" '+(entryState.studentId===s.StudentID?'selected':'')+'>'+s.Name+' ('+s.StudentID+')</option>';
+  }).join('');
+  var stillValid = filtered.some(function(s){ return s.StudentID===entryState.studentId; });
+  if (stillValid){ sel.value = entryState.studentId; loadStudentEntry(); }
+  else { entryState.studentId = ''; document.getElementById('entryFormArea').innerHTML = ''; }
+}
+function loadDateEntriesList(){
+  var date = document.getElementById('e_Date').value;
+  var cls = document.getElementById('e_Class').value;
+  var area = document.getElementById('dateEntriesArea');
+  area.innerHTML = '<div class="empty">Loading…</div>';
+  api.getEntriesForDate(date).then(function(entries){
+    var filtered = cls ? entries.filter(function(e){ return String(e.Class)===String(cls); }) : entries;
+    if (!filtered.length){ area.innerHTML = '<div class="empty">No entries yet for this date</div>'; return; }
+    var html = '<div class="table-wrap"><table><thead><tr><th>Student</th><th>Attendance</th><th># Activities</th><th>Test</th><th>Teacher</th><th>Actions</th></tr></thead><tbody>';
+    filtered.forEach(function(e){
+      var canEdit = STATE.role==='admin' || e.TeacherID===STATE.teacherId;
+      html += '<tr><td>'+e.StudentName+'</td><td>'+(e.Attendance||'-')+'</td><td>'+(e.Activities||[]).length+'</td>'
+        + '<td>'+(e.TestSubject? (e.TestSubject+' ('+e.ObtainedMarks+'/'+e.MaxMarks+')') : '-')+'</td>'
+        + '<td>'+e.TeacherName+'</td>'
+        + '<td>'+(canEdit ? ('<button class="btn btn-sm btn-blue" onclick="editEntry(\''+e.StudentID+'\')">Edit</button> '
+          + '<button class="btn btn-sm btn-danger" onclick="deleteEntryConfirm(\''+e.EntryID+'\')">Delete</button>') : '<span style="color:var(--muted);font-size:12px;">view only</span>') + '</td></tr>';
+    });
+    area.innerHTML = html + '</tbody></table></div>';
+  });
+}
+function editEntry(studentId){
+  entryState.studentId = studentId;
+  document.getElementById('e_Student').value = studentId;
+  loadStudentEntry();
+  document.getElementById('entryFormArea').scrollIntoView({behavior:'smooth'});
+}
+function deleteEntryConfirm(entryId){
+  if (!confirm('Delete this entry?')) return;
+  api.deleteEntry(entryId, actor()).then(function(res){
+    if (!res.success){ alert(res.message); return; }
+    loadDateEntriesList();
+  });
+}
+function loadStudentEntry(){
+  var sid = document.getElementById('e_Student').value;
+  var area = document.getElementById('entryFormArea');
+  if (!sid){ area.innerHTML = ''; return; }
+  var date = document.getElementById('e_Date').value;
+  var student = CACHE.studentsActive.find(function(s){return s.StudentID===sid;});
+  if (!student){ area.innerHTML = ''; return; }
+  api.getEntriesForDate(date).then(function(entries){
+    var existing = entries.find(function(e){ return e.StudentID===sid; }) || {};
+    var activities = existing.Activities || [];
+    area.innerHTML =
+      '<div class="section-title">Attendance</div>'
+      + '<div class="form-row">'
+      + '<div><label>Status</label><select id="en_Attendance">'
+      +   ['Present','Absent','Late','Leave'].map(function(o){return '<option '+(existing.Attendance===o?'selected':'')+'>'+o+'</option>';}).join('')
+      + '</select></div><div></div></div>'
+      + '<div class="form-row">'
+      + '<div><label>Arrival Time</label><input id="en_ArrivalTime" type="time" value="'+(existing.ArrivalTime||'')+'"></div>'
+      + '<div><label>Leaving Time</label><input id="en_LeavingTime" type="time" value="'+(existing.LeavingTime||'')+'"></div></div>'
+
+      + '<div class="section-title">Daily Activities <button class="btn btn-sm btn-outline" onclick="addActivityRow()">+ Add Activity</button></div>'
+      + '<datalist id="timeSuggestions">' + TIME_SUGGESTIONS.map(function(t){return '<option value="'+t+'">';}).join('') + '</datalist>'
+      + '<div id="activityRows"></div>'
+
+      + '<div class="section-title">Test / Exam</div>'
+      + '<div class="form-row">'
+      + '<div><label>Test Type</label><select id="en_TestType">'
+      +   ['','Class Test','Slip Test','Weekly Test','Monthly Test','Unit Test','Model Exam','Final Exam'].map(function(o){return '<option '+(existing.TestType===o?'selected':'')+'>'+(o||'-- None --')+'</option>';}).join('')
+      + '</select></div><div><label>Subject</label><input id="en_TestSubject" value="'+(existing.TestSubject||'')+'"></div></div>'
+      + '<div class="form-row">'
+      + '<div><label>Max Marks</label><input id="en_MaxMarks" type="number" value="'+(existing.MaxMarks||'')+'"></div>'
+      + '<div><label>Obtained Marks</label><input id="en_ObtainedMarks" type="number" value="'+(existing.ObtainedMarks||'')+'"></div></div>'
+
+      + '<div class="section-title">Behaviour & Remarks</div>'
+      + '<label>Behaviour</label><select id="en_Behaviour">'
+      +   ['','Excellent','Good','Average','Needs Improvement'].map(function(o){return '<option '+(existing.Behaviour===o?'selected':'')+'>'+(o||'-- None --')+'</option>';}).join('')
+      + '</select>'
+      + '<label>Teacher Remarks</label><textarea id="en_Observation">'+(existing.Observation||'')+'</textarea>'
+      + '<button class="btn btn-primary" onclick="submitEntry(\''+sid+'\',\''+student.Name+'\',\''+student.Class+'\')">Save Entry</button>'
+      + '<div id="entrySavedMsg"></div>';
+
+    var rowsDiv = document.getElementById('activityRows');
+    rowsDiv.innerHTML = '';
+    if (activities.length) activities.forEach(function(a){ addActivityRow(a); });
+    else addActivityRow();
+  });
+}
+function addActivityRow(data){
+  data = data || {};
+  var id = 'act' + (actRowSeq++);
+  var actOpts = ACTIVITY_OPTIONS.map(function(a){return '<option '+(data.activity===a?'selected':'')+'>'+a+'</option>';}).join('');
+  var statusOpts = ['Done','Pending','Partial'].map(function(s){return '<option '+(data.status===s?'selected':'')+'>'+s+'</option>';}).join('');
+  var row = document.createElement('div');
+  row.className = 'act-row'; row.id = id;
+  row.innerHTML = '<select class="act-activity">'+actOpts+'</select>'
+    + '<input class="act-subject" placeholder="Subject (e.g. Mathematics)" value="'+(data.subject||'')+'">'
+    + '<input class="act-time" placeholder="e.g. 30 Minutes" list="timeSuggestions" value="'+(data.time||'')+'">'
+    + '<select class="act-status">'+statusOpts+'</select>'
+    + '<button type="button" class="rm-btn" onclick="document.getElementById(\''+id+'\').remove()">✕</button>';
+  document.getElementById('activityRows').appendChild(row);
+}
+function collectActivityRows(){
+  return Array.prototype.slice.call(document.querySelectorAll('#activityRows .act-row')).map(function(row){
+    return {
+      activity: row.querySelector('.act-activity').value,
+      subject: row.querySelector('.act-subject').value,
+      time: row.querySelector('.act-time').value,
+      status: row.querySelector('.act-status').value
+    };
+  }).filter(function(a){ return a.subject || a.time; }); // skip completely empty rows
+}
+function submitEntry(sid, sname, sclass){
+  var data = {
+    Date: document.getElementById('e_Date').value, StudentID: sid, StudentName: sname, Class: sclass,
+    Attendance: val('en_Attendance'), ArrivalTime: val('en_ArrivalTime'), LeavingTime: val('en_LeavingTime'),
+    Activities: collectActivityRows(),
+    TestType: val('en_TestType'), TestSubject: val('en_TestSubject'), MaxMarks: val('en_MaxMarks'), ObtainedMarks: val('en_ObtainedMarks'),
+    Behaviour: val('en_Behaviour'), Observation: val('en_Observation')
+  };
+  api.saveDailyEntry(data, actor()).then(function(res){
+    var m = document.getElementById('entrySavedMsg');
+    m.textContent = res.success ? '✅ Saved successfully' : ('❌ ' + res.message);
+    m.style.color = res.success ? 'var(--green)' : 'var(--danger)';
+    if (res.success) loadDateEntriesList();
+  });
+}
+
+/* ===================== HOLIDAYS ===================== */
+function refreshHolidayBanner(){
+  var dateEl = document.getElementById('e_Date');
+  if (!dateEl) return;
+  var date = dateEl.value;
+  api.getHolidays({from:date, to:date}).then(function(list){
+    var banner = document.getElementById('holidayBanner');
+    if (!banner) return;
+    banner.innerHTML = list.length
+      ? ('<div class="card" style="background:#fdf0d0;border-color:#e0a51e;margin-bottom:12px;">'
+          + '<b>🏖️ This date is marked as a Holiday:</b> ' + list[0].Reason + ' '
+          + '<button class="btn btn-sm btn-danger" onclick="removeHoliday(\''+date+'\')">Remove Holiday</button></div>')
+      : '';
+  });
+}
+function openHolidayModal(){
+  var date = document.getElementById('e_Date').value;
+  var html = '<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    + '<span class="close-x" onclick="closeModal()">&times;</span><h3>🏖️ Mark Holiday</h3>'
+    + '<label>Date</label><input id="h_Date" type="date" value="'+date+'">'
+    + '<label>Reason</label><input id="h_Reason" placeholder="e.g. Festival, Public Holiday">'
+    + '<button class="btn btn-primary" onclick="submitHoliday()">Save Holiday</button></div></div>';
+  document.getElementById('modalRoot').innerHTML = html;
+}
+function submitHoliday(){
+  var data = { Date: val('h_Date'), Reason: val('h_Reason') || 'Holiday' };
+  if (!data.Date){ alert('Date is required'); return; }
+  api.saveHoliday(data, actor()).then(function(res){
+    if (!res.success){ alert(res.message); return; }
+    closeModal();
+    refreshHolidayBanner();
+  });
+}
+function removeHoliday(date){
+  if (!confirm('Remove the holiday marked for '+date+'?')) return;
+  api.deleteHoliday(date).then(function(){ refreshHolidayBanner(); });
+}
+
+/* ===================== REPORTS ===================== */
+function renderReports(){
+  var main = document.getElementById('mainContent');
+  Promise.all([
+    cached('students', api.getStudents),
+    STATE.role === 'admin' ? cached('teachers', api.getTeachers) : Promise.resolve([])
+  ]).then(function(res){
+    var students = res[0], teachers = res[1];
+    var studentOpts = ['<option value="">All Students</option>'].concat(students.map(function(s){return '<option value="'+s.StudentID+'">'+s.Name+'</option>';})).join('');
+    var classOpts = ['<option value="">All Classes</option>'].concat(STATE.classes.map(function(c){return '<option>'+c+'</option>';})).join('');
+    var teacherFilterHtml = '';
+    if (STATE.role === 'admin') {
+      var teacherOpts = ['<option value="">All Teachers</option>'].concat(teachers.map(function(t){return '<option value="'+t.TeacherID+'">'+t.Name+'</option>';})).join('');
+      teacherFilterHtml = '<select id="r_Teacher">'+teacherOpts+'</select>';
+    }
+    main.innerHTML = '<div class="card"><div class="toolbar">'
+      + '<select id="r_Student">'+studentOpts+'</select>'
+      + '<select id="r_Class">'+classOpts+'</select>'
+      + teacherFilterHtml
+      + '<input type="date" id="r_From"> <input type="date" id="r_To">'
+      + '<button class="btn btn-primary" style="width:auto;" onclick="runReport()">Filter</button>'
+      + '<button class="btn btn-outline" style="width:auto;" onclick="clearReportFilters()">Clear</button>'
+      + '<button class="btn btn-outline" onclick="exportCSV(window.lastReport||[], \'report\')">Export CSV</button>'
+      + '</div><div id="holidaysInRange"></div><div id="reportArea"></div></div>';
+    runReport();
+  });
+}
+function clearReportFilters(){
+  ['r_Student','r_Class','r_Teacher','r_From','r_To'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  runReport();
+}
+function runReport(){
+  var filters = { studentId: val('r_Student'), className: val('r_Class'), from: val('r_From'), to: val('r_To') };
+  if (STATE.role === 'teacher') {
+    filters.teacherId = STATE.teacherId; // "My Reports" always scoped to the logged-in teacher
+  } else {
+    var tEl = document.getElementById('r_Teacher');
+    if (tEl && tEl.value) filters.teacherId = tEl.value;
+  }
+  api.getReportData(filters).then(function(rows){
+    window.lastReport = rows;
+    var area = document.getElementById('reportArea');
+    if (!rows.length){ area.innerHTML = '<div class="empty">No records found</div>'; return; }
+    var html = '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Teacher</th><th>Attendance</th>'
+      + '<th>Activities</th><th>Test</th><th>Marks</th><th>%</th><th>Grade</th><th>Remarks</th><th>Actions</th></tr></thead><tbody>';
+    rows.forEach(function(e){
+      var canEdit = STATE.role==='admin' || e.TeacherID===STATE.teacherId;
+      html += '<tr><td>'+e.Date+'</td><td>'+e.StudentName+'</td><td>'+e.Class+'</td><td>'+e.TeacherName+'</td><td>'+(e.Attendance||'-')+'</td>'
+        + '<td>'+(e.Activities||[]).map(function(a){return a.activity;}).join(', ')+'</td>'
+        + '<td>'+(e.TestSubject||'-')+'</td><td>'+(e.ObtainedMarks||'-')+'/'+(e.MaxMarks||'-')+'</td><td>'+(e.Percentage||'-')+'</td><td>'+(e.Grade||'-')+'</td>'
+        + '<td>'+(e.Observation||'')+'</td>'
+        + '<td>'+(canEdit ? ('<button class="btn btn-sm btn-danger" onclick="deleteEntryConfirm(\''+e.EntryID+'\');setTimeout(runReport,400)">Delete</button>') : '') + '</td></tr>';
+    });
+    area.innerHTML = html + '</tbody></table></div>';
+  });
+  api.getHolidays({from:filters.from, to:filters.to}).then(function(holidays){
+    var area = document.getElementById('holidaysInRange');
+    if (!area) return;
+    area.innerHTML = holidays.length
+      ? ('<div class="section-title">🏖️ Holidays</div><div class="table-wrap" style="margin-bottom:12px;">' + tableize(holidays,['Date','Reason'],['Date','Reason']) + '</div>')
+      : '';
+  });
+}
+function exportCSV(rows, name){
+  if (!rows || !rows.length){ alert('No data to export'); return; }
+  var flat = rows.map(function(r){
+    var c = {}; Object.keys(r).forEach(function(k){ if (k!=='_row') c[k] = (k==='Activities') ? JSON.stringify(r[k]) : r[k]; });
+    return c;
+  });
+  var keys = Object.keys(flat[0]);
+  var csv = keys.join(',') + '\n' + flat.map(function(r){
+    return keys.map(function(k){ return '"'+String(r[k]||'').replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = name + '_' + new Date().toISOString().substring(0,10) + '.csv';
+  link.click();
+}
+
+/* ===================== PARENT PORTAL (no login, read-only) ===================== */
+var parentAllEntries = []; // cached client-side so the date filter needs no extra API calls
+var parentAllHolidays = [];
+function loadParentPortal(studentId){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('parentScreen').classList.remove('hidden');
+  var content = document.getElementById('parentContent');
+  content.innerHTML = '<div class="empty">Loading student profile…</div>';
+  Promise.all([api.getConfig(), api.getStudentProfile(studentId), api.getHolidays({})]).then(function(res){
+    var cfg = res[0], profile = res[1], holidays = res[2];
+    applyBrandingEverywhere(cfg);
+    if (!profile.success){ content.innerHTML = '<div class="empty">'+profile.message+'</div>'; return; }
+    parentAllEntries = profile.entries || [];
+    parentAllHolidays = holidays || [];
+
+    var s = profile.student;
+    var today = new Date().toISOString().substring(0,10);
+    var monthAgo = new Date(Date.now() - 30*86400000).toISOString().substring(0,10);
+
+    var html = '<div class="card parent-hero"><div><h2 style="margin:0 0 4px;">'+s.Name+'</h2>'
+      + '<div style="color:var(--muted);font-size:13px;">Student ID: '+s.StudentID+' • Class '+s.Class+' • Batch '+s.Batch+'</div>'
+      + '<div style="color:var(--muted);font-size:13px;">Teacher: '+(profile.teacherName||'-')+'</div></div>'
+      + '<div class="parent-actions"><button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Print</button>'
+      + '<button class="btn btn-blue btn-sm" onclick="window.print()">⬇️ Download PDF</button></div></div>';
+
+    html += '<div class="grid grid-2" style="margin-top:12px;">'
+      + statCard(profile.attendancePct + '%', 'Overall Attendance')
+      + statCard(parentAllEntries.length, 'Total Days Recorded')
+      + '</div>';
+
+    html += '<div class="section-title">🔎 Filter by Date</div>'
+      + '<div class="card toolbar no-print">'
+      + '<div><label>From</label><input type="date" id="p_From" value="'+monthAgo+'"></div>'
+      + '<div><label>To</label><input type="date" id="p_To" value="'+today+'"></div>'
+      + '<button class="btn btn-primary" style="width:auto;align-self:flex-end;" onclick="renderParentTimeline()">Apply</button>'
+      + '<button class="btn btn-outline" style="width:auto;align-self:flex-end;" onclick="clearParentFilter()">Show All</button>'
+      + '</div>';
+
+    html += '<div class="section-title">📅 Daily Activities & Teacher Remarks</div>'
+      + '<div class="card table-wrap" id="parentTimelineArea"></div>';
+
+    var testMarks = parentAllEntries.filter(function(e){ return e.TestSubject; });
+    html += '<div class="section-title">📄 Test Marks</div><div class="card table-wrap">'
+      + (testMarks.length ? tableize(testMarks,['Date','TestType','TestSubject','ObtainedMarks','MaxMarks','Percentage','Grade','PassFail'],
+          ['Date','Type','Subject','Marks','Max','%','Grade','Result']) : '<div class="empty">No test records</div>') + '</div>';
+
+    content.innerHTML = html;
+    renderParentTimeline();
+  });
+}
+function clearParentFilter(){
+  document.getElementById('p_From').value = '';
+  document.getElementById('p_To').value = '';
+  renderParentTimeline();
+}
+function renderParentTimeline(){
+  var from = document.getElementById('p_From').value;
+  var to = document.getElementById('p_To').value;
+  var rows = parentAllEntries.filter(function(e){
+    if (from && e.Date < from) return false;
+    if (to && e.Date > to) return false;
+    return true;
+  });
+  var timeline = rows.map(function(e){
+    var acts = (e.Activities||[]).map(function(a){
+      return a.activity + (a.subject ? ' - '+a.subject : '') + (a.time ? ' ('+a.time+(a.status?', '+a.status:'')+')' : (a.status ? ' ('+a.status+')' : ''));
+    }).join('; ');
+    return { date:e.Date, attendance:e.Attendance||'-', activities: acts || '-', teacher: e.TeacherName || '-', remarks: e.Observation || '-' };
+  });
+  // holidays are global (visible to every student) - merge them into the same timeline
+  var holidayRows = parentAllHolidays.filter(function(h){
+    if (from && h.Date < from) return false;
+    if (to && h.Date > to) return false;
+    return true;
+  }).map(function(h){ return { date:h.Date, attendance:'Holiday', activities:'🏖️ '+h.Reason, teacher:'-', remarks:'-' }; });
+  var merged = timeline.concat(holidayRows).sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+  var area = document.getElementById('parentTimelineArea');
+  area.innerHTML = merged.length
+    ? tableize(merged, ['date','attendance','activities','teacher','remarks'], ['Date','Attendance','Activities Performed','Teacher','Teacher Remarks'])
+    : '<div class="empty">No records in this date range</div>';
+}
+</script>
+</body>
+</html>
