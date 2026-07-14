@@ -53,8 +53,8 @@
   #loginMsg{color:var(--danger);font-size:13px;text-align:center;margin-top:6px;min-height:16px;}
 
   /* ---------- App shell ---------- */
-  header.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap;}
-  header.topbar .brand-header{flex:1;min-width:0;padding-right:150px;} /* leave room so text never runs under the floating buttons */
+  header.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap;padding-right:140px;}
+  header.topbar .brand-header{flex:1;min-width:0;}
   header.topbar .userinfo{font-size:13px;opacity:.9;white-space:nowrap;padding:8px 10px 8px 0;flex-shrink:0;}
   nav.tabs{display:flex;gap:4px;background:var(--card);padding:6px 10px;overflow-x:auto;border-bottom:1px solid var(--border);
     -webkit-overflow-scrolling:touch;}
@@ -66,7 +66,7 @@
   .floating-actions .toggle-theme{box-shadow:0 2px 8px rgba(0,0,0,.25);}
   .btn-logout-fixed{background:var(--danger) !important;}
   @media(max-width:560px){
-    header.topbar .brand-header{padding-right:100px;}
+    header.topbar{padding-right:100px;}
     header.topbar .brand-header .brand-text span{display:none;} /* hide address on very small screens, keep name */
     header.topbar .userinfo{display:none;} /* hide "Name (role)" text to save room */
   }
@@ -830,8 +830,8 @@ function loadParentPortal(studentId){
   document.getElementById('parentScreen').classList.remove('hidden');
   var content = document.getElementById('parentContent');
   content.innerHTML = '<div class="empty">Loading student profile…</div>';
-  Promise.all([api.getConfig(), api.getStudentProfile(studentId)]).then(function(res){
-    var cfg = res[0], profile = res[1];
+  Promise.all([api.getConfig(), api.getStudentProfile(studentId), api.getTeachers()]).then(function(res){
+    var cfg = res[0], profile = res[1], teachers = res[2] || [];
     applyBrandingEverywhere(cfg);
     if (!profile.success){ content.innerHTML = '<div class="empty">'+profile.message+'</div>'; return; }
     // holidays are now real per-student entries (Attendance='Holiday'), auto-created when Admin
@@ -842,6 +842,8 @@ function loadParentPortal(studentId){
     var s = profile.student;
     var today = new Date().toISOString().substring(0,10);
     var monthAgo = new Date(Date.now() - 30*86400000).toISOString().substring(0,10);
+    var activeTeacherNames = teachers.filter(function(t){ return t.Status === 'Active'; })
+      .map(function(t){ return t.Name; }).join(', ') || '-';
 
     var html = '<div class="card parent-hero" style="background:linear-gradient(135deg, rgba(27,138,90,.10), rgba(21,101,192,.10));border:2px solid var(--green);">'
       + '<div style="flex:1;min-width:0;">'
@@ -851,7 +853,7 @@ function loadParentPortal(studentId){
       + infoLine('Parent / Father Name', s.FatherName || '-')
       + infoLine('Parent Mobile', s.Mobile || '-')
       + infoLine('Address', s.Address || '-')
-      + infoLine('Teacher', profile.teacherName || '-')
+      + infoLine('Teachers', activeTeacherNames)
       + '</div>'
       + '<div class="parent-actions"><button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Print</button>'
       + '<button class="btn btn-blue btn-sm" onclick="window.print()">⬇️ Download PDF</button></div></div>';
