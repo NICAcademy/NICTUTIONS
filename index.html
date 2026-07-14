@@ -12,8 +12,9 @@
   }
   [data-theme="dark"]{ --bg:#101613; --card:#182019; --text:#e7efe9; --muted:#9db0a6; --border:#2a352e; }
   *{box-sizing:border-box;}
+  html{font-size:16px;}
   html,body{margin:0;max-width:100%;overflow-x:hidden;}
-  body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;}
   a{color:inherit;}
   .hidden{display:none !important;}
   img.logo{height:44px;width:44px;object-fit:contain;border-radius:8px;background:#fff;padding:2px;flex-shrink:0;}
@@ -40,32 +41,34 @@
   input,select,textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;
     margin-bottom:12px;background:var(--card);color:var(--text);font-size:15px;min-height:44px;}
   textarea{min-height:70px;}
-  label{font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;}
-  .btn{border:none;border-radius:8px;padding:11px 16px;font-weight:600;cursor:pointer;font-size:14px;min-height:44px;}
+  label{font-size:13px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;}
+  .btn{border:none;border-radius:8px;padding:11px 16px;font-weight:600;cursor:pointer;font-size:15px;min-height:44px;}
   .btn-primary{background:var(--green);color:#fff;width:100%;}
   .btn-primary:hover{background:var(--green-dark);}
   .btn-blue{background:var(--blue);color:#fff;}
   .btn-blue:hover{background:var(--blue-dark);}
   .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
   .btn-danger{background:var(--danger);color:#fff;}
-  .btn-sm{padding:7px 10px;font-size:12px;min-height:36px;}
+  .btn-sm{padding:7px 10px;font-size:13px;min-height:36px;}
   #loginMsg{color:var(--danger);font-size:13px;text-align:center;margin-top:6px;min-height:16px;}
 
   /* ---------- App shell ---------- */
   header.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap;}
-  header.topbar .brand-header{flex:1;min-width:0;padding-right:0;}
-  header.topbar .userinfo{font-size:12px;opacity:.9;white-space:nowrap;}
-  header.topbar .actions{display:flex;align-items:center;gap:6px;flex-shrink:0;padding:8px 10px 8px 0;}
+  header.topbar .brand-header{flex:1;min-width:0;padding-right:150px;} /* leave room so text never runs under the floating buttons */
+  header.topbar .userinfo{font-size:13px;opacity:.9;white-space:nowrap;padding:8px 10px 8px 0;flex-shrink:0;}
   nav.tabs{display:flex;gap:4px;background:var(--card);padding:6px 10px;overflow-x:auto;border-bottom:1px solid var(--border);
     -webkit-overflow-scrolling:touch;}
   nav.tabs button{white-space:nowrap;background:transparent;border:none;padding:10px 14px;border-radius:8px;
-    cursor:pointer;font-weight:600;color:var(--muted);font-size:13px;min-height:40px;}
+    cursor:pointer;font-weight:600;color:var(--muted);font-size:14px;min-height:40px;}
   nav.tabs button.active{background:var(--green);color:#fff;}
   main{padding:14px;max-width:1200px;margin:0 auto;width:100%;}
+  .floating-actions{position:fixed;top:10px;right:10px;z-index:1000;display:flex;gap:6px;}
+  .floating-actions .toggle-theme{box-shadow:0 2px 8px rgba(0,0,0,.25);}
+  .btn-logout-fixed{background:var(--danger) !important;}
   @media(max-width:560px){
+    header.topbar .brand-header{padding-right:100px;}
     header.topbar .brand-header .brand-text span{display:none;} /* hide address on very small screens, keep name */
-    header.topbar .userinfo{display:none;} /* hide "Name (role)" text, keep icon buttons visible */
-    .toggle-theme{padding:8px;min-width:40px;}
+    header.topbar .userinfo{display:none;} /* hide "Name (role)" text to save room */
   }
   .grid{display:grid;gap:12px;}
   .grid-4{grid-template-columns:repeat(4,1fr);}
@@ -77,18 +80,19 @@
   .stat-card .num{font-size:24px;font-weight:700;}
   .stat-card .lbl{color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
   .section-title{font-size:15px;font-weight:700;margin:16px 0 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
-  table{width:100%;border-collapse:collapse;font-size:13px;}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
   th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
-  th{color:var(--muted);font-size:11px;text-transform:uppercase;}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;}
   tr:hover td{background:rgba(27,138,90,.05);}
   .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
   .toolbar input,.toolbar select{width:auto;margin-bottom:0;min-width:140px;flex:1;}
-  .badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+  .badge{padding:3px 9px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;}
   .badge-green{background:#d9f2e4;color:var(--green-dark);}
   .badge-red{background:#fbdedb;color:var(--danger);}
   .badge-yellow{background:#fdf0d0;color:#8a6111;}
-  [data-theme="dark"] .badge-green{background:#12351f;} [data-theme="dark"] .badge-red{background:#3a1712;} [data-theme="dark"] .badge-yellow{background:#3a2c0d;}
+  .badge-blue{background:#d7e6fb;color:var(--blue-dark);}
+  [data-theme="dark"] .badge-green{background:#12351f;} [data-theme="dark"] .badge-red{background:#3a1712;} [data-theme="dark"] .badge-yellow{background:#3a2c0d;} [data-theme="dark"] .badge-blue{background:#122a4a;}
   .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:50;padding:12px;}
   .modal{background:var(--card);border-radius:var(--radius);padding:18px;width:520px;max-width:100%;max-height:92vh;overflow:auto;}
   .modal h3{margin-top:0;}
@@ -129,7 +133,7 @@
 <!-- ================= LOGIN ================= -->
 <div id="loginScreen">
   <div class="brand-header" style="border-radius:12px;max-width:360px;width:100%;">
-    <img class="logo" src="logo.jpg" alt="Logo" onerror="this.style.display='none'">
+    <img class="logo" src="logo.jpg" alt="Logo" onerror="handleLogoError(this)">
     <div class="brand-text"><b id="loginInstName">NIC ACADMEY</b><span id="loginInstAddr"></span></div>
   </div>
   <div class="login-card">
@@ -153,14 +157,10 @@
   <div class="app-sticky">
     <header class="topbar">
       <div class="brand-header">
-        <img class="logo" src="logo.jpg" alt="Logo" onerror="this.style.display='none'">
+        <img class="logo" src="logo.jpg" alt="Logo" onerror="handleLogoError(this)">
         <div class="brand-text"><b id="instituteNameLbl">Tutorial Institute</b><span id="instituteAddrLbl"></span></div>
       </div>
-      <div class="actions">
-        <span class="userinfo" id="userInfoLbl"></span>
-        <button class="toggle-theme" onclick="toggleTheme()" title="Toggle theme">🌓</button>
-        <button class="toggle-theme" onclick="logout()" title="Logout">🚪 Logout</button>
-      </div>
+      <span class="userinfo" id="userInfoLbl"></span>
     </header>
     <nav class="tabs" id="navTabs"></nav>
   </div>
@@ -168,14 +168,21 @@
   <div class="footer-note">Tutorial Student Activity Management System</div>
 </div>
 
+<!-- Fixed floating controls: always on top, never affected by header wrapping/scrolling -->
+<div id="floatingActions" class="floating-actions hidden no-print">
+  <button class="toggle-theme" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+  <button class="toggle-theme btn-logout-fixed" onclick="logout()" title="Logout">🚪 Logout</button>
+</div>
+
 <!-- ================= PARENT PORTAL (standalone, no login) ================= -->
 <div id="parentScreen" class="hidden">
   <header class="brand-header">
-    <img class="logo" src="logo.jpg" alt="Logo" onerror="this.style.display='none'">
+    <img class="logo" src="logo.jpg" alt="Logo" onerror="handleLogoError(this)">
     <div class="brand-text"><b id="parentInstName">Tutorial Institute</b><span id="parentInstAddr"></span></div>
   </header>
+
   <div class="print-header">
-    <img class="logo" src="logo.jpg" alt="Logo" onerror="this.style.display='none'">
+    <img class="logo" src="logo.jpg" alt="Logo" onerror="handleLogoError(this)">
     <div class="brand-text"><b id="printInstName">Tutorial Institute</b><span id="printInstAddr"></span><span id="printInstPhone"></span></div>
   </div>
   <div class="parent-wrap" id="parentContent"></div>
@@ -190,8 +197,20 @@ var CACHE = { students:null, teachers:null, config:null };
 var INITIAL_STUDENT_ID = new URLSearchParams(location.search).get('studentId')
   || new URLSearchParams(location.search).get('studentid') || '';
 
+/* Logo file lookup: GitHub Pages is case-sensitive, so "logo.jpg" and "Logo.jpg" are
+ * different files on the server even though Windows/Mac treat them as the same. This
+ * tries the common variants automatically instead of just hiding the logo on a mismatch. */
+var LOGO_CANDIDATES = ['logo.jpg','Logo.jpg','LOGO.jpg','logo.png','Logo.png','logo.jpeg','Logo.jpeg'];
+function handleLogoError(img){
+  var current = img.getAttribute('data-tried') || img.getAttribute('src');
+  var idx = LOGO_CANDIDATES.indexOf(current);
+  var next = LOGO_CANDIDATES[idx + 1];
+  if (next){ img.setAttribute('data-tried', next); img.src = next; }
+  else { img.style.display = 'none'; }
+}
+
 /* ===================== CONFIG ===================== */
-var API_URL = 'https://script.google.com/macros/s/AKfycbyaS6uvKkH2_IQSkt2vaASxU0_qZp88at-pJ10NrMC9KgdgBwprCdi4qQDQJUASzjwFpw/exec';
+var API_URL = 'https://script.google.com/macros/s/AKfycbwMkfxekH3SBaGjv94AwSY8JOo_W6peUV_WJVcaNjsruSSiYhKIJJjRP--12IHTAI-VeA/exec';
 
 /* ===================== fetch-based API client ===================== */
 function callApi(action, payload){
@@ -218,6 +237,7 @@ var api = {
   getEntriesForDate: function(date){ return callApi('getEntriesForDate', {date:date}); },
   getStudentProfile: function(id){ return callApi('getStudentProfile', {studentId:id}); },
   getDashboardData: function(){ return callApi('getDashboardData'); },
+  getPendingEntries: function(date){ return callApi('getPendingEntries', {date:date}); },
   getReportData: function(filters){ return callApi('getReportData', {filters:filters}); },
   saveHoliday: function(data, actor){ return callApi('saveHoliday', {data:data, actor:actor}); },
   deleteHoliday: function(date){ return callApi('deleteHoliday', {date:date}); },
@@ -296,6 +316,7 @@ function actor(){ return { role: STATE.role, teacherId: STATE.teacherId, name: S
 function enterApp(){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('floatingActions').classList.remove('hidden');
   document.getElementById('userInfoLbl').textContent = STATE.name + ' (' + STATE.role + ')';
   cached('config', api.getConfig).then(function(cfg){
     STATE.classes = cfg.classes; STATE.batches = cfg.batches;
@@ -305,7 +326,7 @@ function enterApp(){
 }
 function buildNav(){
   var tabs = STATE.role === 'admin'
-    ? [['dashboard','Dashboard'],['students','Students'],['teachers','Teachers'],['reports','Reports']]
+    ? [['dashboard','Dashboard'],['students','Students'],['teachers','Teachers'],['holidays','Holidays'],['reports','Reports']]
     : [['dashboard','Dashboard'],['entry','Daily Entry'],['reports','My Reports']];
   var nav = document.getElementById('navTabs');
   nav.innerHTML = tabs.map(function(t,i){
@@ -315,7 +336,7 @@ function buildNav(){
 }
 function goTab(tab){
   document.querySelectorAll('#navTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.tab===tab); });
-  var m = { dashboard:renderDashboard, students:renderStudents, teachers:renderTeachers, entry:renderEntry, reports:renderReports };
+  var m = { dashboard:renderDashboard, students:renderStudents, teachers:renderTeachers, holidays:renderHolidays, entry:renderEntry, reports:renderReports };
   (m[tab] || renderDashboard)();
 }
 
@@ -330,19 +351,30 @@ function renderDashboard(){
     }
     html += '<div class="grid grid-4">'
       + statCard(d.totalStudents,'Active Students')
-      + statCard(d.present,'Present Today','green')
-      + statCard(d.absent,'Absent Today','red')
-      + statCard(d.pendingHomework,'Pending Homework','yellow')
+      + statCard(d.present,'Present Today')
+      + statCard(d.absent,'Absent Today')
+      + statCard(d.testsToday,'Tests Today')
       + '</div>';
-    html += '<div class="section-title">📅 ' + d.today + '</div><div class="grid grid-2">';
-    html += '<div class="card"><b>🎂 Upcoming Birthdays (7 days)</b><div class="table-wrap">'
-      + (d.birthdays.length ? tableize(d.birthdays,['name','class','dob'],['Name','Class','DOB']) : '<div class="empty">None</div>') + '</div></div>';
-    html += '<div class="card"><b>⚠️ Low Attendance (&lt;75%)</b><div class="table-wrap">'
-      + (d.lowAttendance.length ? tableize(d.lowAttendance,['name','pct'],['Name','Attendance %']) : '<div class="empty">None</div>') + '</div></div>';
-    html += '</div>';
-    html += '<div class="card" style="margin-top:14px;"><b>🕒 Recent Activities</b><div class="table-wrap">'
-      + (d.recentActivities.length ? tableize(d.recentActivities,['date','student','activities','note'],['Date','Student','Activities','Note']) : '<div class="empty">No recent activity</div>') + '</div></div>';
+    html += '<div class="section-title">🎂 Upcoming Birthdays (7 days)</div>'
+      + '<div class="card table-wrap">' + (d.birthdays.length ? tableize(d.birthdays,['name','class','dob'],['Name','Class','DOB']) : '<div class="empty">None</div>') + '</div>';
+
+    html += '<div class="section-title">📝 Pending Daily Entries'
+      + '<input type="date" id="pendingDateFilter" value="'+d.today+'" onchange="loadPendingEntries()" style="width:auto;display:inline-block;">'
+      + '</div>'
+      + '<div class="card table-wrap" id="pendingEntriesArea"><div class="empty">Loading…</div></div>';
+
     main.innerHTML = html;
+    loadPendingEntries();
+  });
+}
+function loadPendingEntries(){
+  var date = document.getElementById('pendingDateFilter').value;
+  var area = document.getElementById('pendingEntriesArea');
+  area.innerHTML = '<div class="empty">Loading…</div>';
+  api.getPendingEntries(date).then(function(res){
+    if (res.holiday){ area.innerHTML = '<div class="empty">🏖️ This date is a holiday ('+res.reason+') — no entries expected.</div>'; return; }
+    if (!res.pending.length){ area.innerHTML = '<div class="empty">✅ All active students have an entry for this date.</div>'; return; }
+    area.innerHTML = tableize(res.pending, ['name','class','studentId'], ['Student','Class','Student ID']);
   });
 }
 function statCard(num,lbl){ return '<div class="card stat-card"><div class="num">'+num+'</div><div class="lbl">'+lbl+'</div></div>'; }
@@ -397,7 +429,7 @@ function removeStudent(id){
 }
 function openStudentModal(id){
   var s = id ? CACHE.students.find(function(x){return x.StudentID===id;}) : {};
-  var classOpts = STATE.classes.map(function(c){return '<option '+(String(s.Class)===String(c)?'selected':'')+'>'+c+'</option>';}).join('');
+  var classOpts = STATE.classes.map(function(c){return '<option '+(String(s.Class).trim()===String(c).trim()?'selected':'')+'>'+c+'</option>';}).join('');
   var batchOpts = STATE.batches.map(function(b){return '<option '+(s.Batch===b?'selected':'')+'>'+b+'</option>';}).join('');
   var html = '<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">'
     + '<span class="close-x" onclick="closeModal()">&times;</span><h3>'+(id?'Edit':'Add')+' Student</h3>'
@@ -496,7 +528,7 @@ function renderEntry(){
       + '<label>Student</label><select id="e_Student" onchange="onEntryStudentChange()"></select>'
       + '<div id="entryFormArea"></div>'
       + '</div>'
-      + '<div class="section-title">🏖️ Holiday <button class="btn btn-sm btn-outline" onclick="openHolidayModal()">Mark / Remove Holiday</button></div>'
+      + '<div class="section-title">🏖️ Holiday</div>'
       + '<div id="holidayBanner"></div>'
       + '<div class="section-title">🗓️ Entries for Selected Date</div>'
       + '<div id="dateEntriesArea" class="card"><div class="empty">Pick a date/class above</div></div>';
@@ -520,7 +552,7 @@ function populateStudentDropdown(){
   var cls = document.getElementById('e_Class').value;
   // String() coercion: Google Sheets silently stores pure-digit class names (e.g. "6") as
   // a Number, so a strict === against the dropdown's string value would otherwise fail here.
-  var filtered = CACHE.studentsActive.filter(function(s){ return !cls || String(s.Class)===String(cls); });
+  var filtered = CACHE.studentsActive.filter(function(s){ return !cls || String(s.Class).trim()===String(cls).trim(); });
   var sel = document.getElementById('e_Student');
   sel.innerHTML = '<option value="">-- Select Student to Add/Edit --</option>' + filtered.map(function(s){
     return '<option value="'+s.StudentID+'" '+(entryState.studentId===s.StudentID?'selected':'')+'>'+s.Name+' ('+s.StudentID+')</option>';
@@ -535,16 +567,18 @@ function loadDateEntriesList(){
   var area = document.getElementById('dateEntriesArea');
   area.innerHTML = '<div class="empty">Loading…</div>';
   api.getEntriesForDate(date).then(function(entries){
-    var filtered = cls ? entries.filter(function(e){ return String(e.Class)===String(cls); }) : entries;
+    var filtered = cls ? entries.filter(function(e){ return String(e.Class).trim()===String(cls).trim(); }) : entries;
     if (!filtered.length){ area.innerHTML = '<div class="empty">No entries yet for this date</div>'; return; }
     var html = '<div class="table-wrap"><table><thead><tr><th>Student</th><th>Attendance</th><th># Activities</th><th>Test</th><th>Teacher</th><th>Actions</th></tr></thead><tbody>';
     filtered.forEach(function(e){
-      var canEdit = STATE.role==='admin' || e.TeacherID===STATE.teacherId;
-      html += '<tr><td>'+e.StudentName+'</td><td>'+(e.Attendance||'-')+'</td><td>'+(e.Activities||[]).length+'</td>'
+      var isHoliday = e.Attendance === 'Holiday';
+      var canEdit = !isHoliday && (STATE.role==='admin' || e.TeacherID===STATE.teacherId);
+      html += '<tr'+(isHoliday?' style="background:rgba(21,101,192,.06);"':'')+'><td>'+e.StudentName+'</td>'
+        + '<td>'+(isHoliday ? '<span class="badge badge-blue">🏖️ Holiday</span>' : (e.Attendance||'-'))+'</td><td>'+(e.Activities||[]).length+'</td>'
         + '<td>'+(e.TestSubject? (e.TestSubject+' ('+e.ObtainedMarks+'/'+e.MaxMarks+')') : '-')+'</td>'
         + '<td>'+e.TeacherName+'</td>'
-        + '<td>'+(canEdit ? ('<button class="btn btn-sm btn-blue" onclick="editEntry(\''+e.StudentID+'\')">Edit</button> '
-          + '<button class="btn btn-sm btn-danger" onclick="deleteEntryConfirm(\''+e.EntryID+'\')">Delete</button>') : '<span style="color:var(--muted);font-size:12px;">view only</span>') + '</td></tr>';
+        + '<td>'+(isHoliday ? '<span style="color:var(--muted);font-size:12px;">managed via Holidays page</span>' : (canEdit ? ('<button class="btn btn-sm btn-blue" onclick="editEntry(\''+e.StudentID+'\')">Edit</button> '
+          + '<button class="btn btn-sm btn-danger" onclick="deleteEntryConfirm(\''+e.EntryID+'\')">Delete</button>') : '<span style="color:var(--muted);font-size:12px;">view only</span>')) + '</td></tr>';
     });
     area.innerHTML = html + '</tbody></table></div>';
   });
@@ -650,6 +684,7 @@ function submitEntry(sid, sname, sclass){
 }
 
 /* ===================== HOLIDAYS ===================== */
+// Teacher's Daily Entry view: read-only status banner (no edit ability - Admin manages holidays)
 function refreshHolidayBanner(){
   var dateEl = document.getElementById('e_Date');
   if (!dateEl) return;
@@ -659,32 +694,54 @@ function refreshHolidayBanner(){
     if (!banner) return;
     banner.innerHTML = list.length
       ? ('<div class="card" style="background:#fdf0d0;border-color:#e0a51e;margin-bottom:12px;">'
-          + '<b>🏖️ This date is marked as a Holiday:</b> ' + list[0].Reason + ' '
-          + '<button class="btn btn-sm btn-danger" onclick="removeHoliday(\''+date+'\')">Remove Holiday</button></div>')
-      : '';
+          + '<b>🏖️ This date is marked as a Holiday:</b> ' + list[0].Reason
+          + '<div style="font-size:12px;color:var(--muted);margin-top:4px;">Managed by Admin — see the Admin Holidays page to change this.</div></div>')
+      : '<div class="empty">Not a holiday</div>';
   });
 }
-function openHolidayModal(){
-  var date = document.getElementById('e_Date').value;
-  var html = '<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">'
-    + '<span class="close-x" onclick="closeModal()">&times;</span><h3>🏖️ Mark Holiday</h3>'
-    + '<label>Date</label><input id="h_Date" type="date" value="'+date+'">'
-    + '<label>Reason</label><input id="h_Reason" placeholder="e.g. Festival, Public Holiday">'
-    + '<button class="btn btn-primary" onclick="submitHoliday()">Save Holiday</button></div></div>';
-  document.getElementById('modalRoot').innerHTML = html;
+
+// Admin-only Holiday Management page
+function renderHolidays(){
+  var main = document.getElementById('mainContent');
+  var today = new Date().toISOString().substring(0,10);
+  main.innerHTML = '<div class="card">'
+    + '<div class="section-title">🏖️ Mark a Holiday</div>'
+    + '<div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Marking a holiday automatically records it for every active student, so it shows up in the Parent Portal, Reports, and Daily Activity history.</div>'
+    + '<div class="form-row"><div><label>Date</label><input type="date" id="hm_Date" value="'+today+'"></div>'
+    + '<div><label>Reason</label><input id="hm_Reason" placeholder="e.g. Festival, Public Holiday"></div></div>'
+    + '<button class="btn btn-primary" style="width:auto;" onclick="submitHolidayAdmin()">Save Holiday</button>'
+    + '<div id="holidaySavedMsg"></div>'
+    + '</div>'
+    + '<div class="section-title">📋 All Holidays</div>'
+    + '<div class="card table-wrap" id="holidayListArea"><div class="empty">Loading…</div></div>';
+  loadHolidayList();
 }
-function submitHoliday(){
-  var data = { Date: val('h_Date'), Reason: val('h_Reason') || 'Holiday' };
+function loadHolidayList(){
+  api.getHolidays({}).then(function(list){
+    var area = document.getElementById('holidayListArea');
+    if (!list.length){ area.innerHTML = '<div class="empty">No holidays marked yet</div>'; return; }
+    var html = '<table><thead><tr><th>Date</th><th>Reason</th><th>Marked By</th><th>Actions</th></tr></thead><tbody>';
+    list.forEach(function(h){
+      html += '<tr><td>'+h.Date+'</td><td>'+h.Reason+'</td><td>'+(h.CreatedBy||'-')+'</td>'
+        + '<td><button class="btn btn-sm btn-danger" onclick="removeHolidayAdmin(\''+h.Date+'\')">Delete</button></td></tr>';
+    });
+    area.innerHTML = html + '</tbody></table>';
+  });
+}
+function submitHolidayAdmin(){
+  var data = { Date: val('hm_Date'), Reason: val('hm_Reason') || 'Holiday' };
   if (!data.Date){ alert('Date is required'); return; }
   api.saveHoliday(data, actor()).then(function(res){
-    if (!res.success){ alert(res.message); return; }
-    closeModal();
-    refreshHolidayBanner();
+    var m = document.getElementById('holidaySavedMsg');
+    if (!res.success){ m.textContent = '❌ ' + res.message; m.style.color = 'var(--danger)'; return; }
+    m.textContent = '✅ Holiday saved for all active students'; m.style.color = 'var(--green)';
+    invalidate('dashboard');
+    loadHolidayList();
   });
 }
-function removeHoliday(date){
-  if (!confirm('Remove the holiday marked for '+date+'?')) return;
-  api.deleteHoliday(date).then(function(){ refreshHolidayBanner(); });
+function removeHolidayAdmin(date){
+  if (!confirm('Remove the holiday for '+date+'? This also removes the auto-created holiday records for all students on that date.')) return;
+  api.deleteHoliday(date).then(function(){ invalidate('dashboard'); loadHolidayList(); });
 }
 
 /* ===================== REPORTS ===================== */
@@ -710,7 +767,7 @@ function renderReports(){
       + '<button class="btn btn-primary" style="width:auto;" onclick="runReport()">Filter</button>'
       + '<button class="btn btn-outline" style="width:auto;" onclick="clearReportFilters()">Clear</button>'
       + '<button class="btn btn-outline" onclick="exportCSV(window.lastReport||[], \'report\')">Export CSV</button>'
-      + '</div><div id="holidaysInRange"></div><div id="reportArea"></div></div>';
+      + '</div><div id="reportArea"></div></div>';
     runReport();
   });
 }
@@ -735,21 +792,16 @@ function runReport(){
     var html = '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Teacher</th><th>Attendance</th>'
       + '<th>Activities</th><th>Test</th><th>Marks</th><th>%</th><th>Grade</th><th>Remarks</th><th>Actions</th></tr></thead><tbody>';
     rows.forEach(function(e){
-      var canEdit = STATE.role==='admin' || e.TeacherID===STATE.teacherId;
-      html += '<tr><td>'+e.Date+'</td><td>'+e.StudentName+'</td><td>'+e.Class+'</td><td>'+e.TeacherName+'</td><td>'+(e.Attendance||'-')+'</td>'
+      var isHoliday = e.Attendance === 'Holiday';
+      var canEdit = !isHoliday && (STATE.role==='admin' || e.TeacherID===STATE.teacherId);
+      html += '<tr'+(isHoliday?' style="background:rgba(21,101,192,.06);"':'')+'><td>'+e.Date+'</td><td>'+e.StudentName+'</td><td>'+e.Class+'</td><td>'+e.TeacherName+'</td>'
+        + '<td>'+(isHoliday ? '<span class="badge badge-blue">🏖️ Holiday</span>' : (e.Attendance||'-'))+'</td>'
         + '<td>'+(e.Activities||[]).map(function(a){return a.activity;}).join(', ')+'</td>'
         + '<td>'+(e.TestSubject||'-')+'</td><td>'+(e.ObtainedMarks||'-')+'/'+(e.MaxMarks||'-')+'</td><td>'+(e.Percentage||'-')+'</td><td>'+(e.Grade||'-')+'</td>'
         + '<td>'+(e.Observation||'')+'</td>'
-        + '<td>'+(canEdit ? ('<button class="btn btn-sm btn-danger" onclick="deleteEntryConfirm(\''+e.EntryID+'\');setTimeout(runReport,400)">Delete</button>') : '') + '</td></tr>';
+        + '<td>'+(isHoliday ? '<span style="color:var(--muted);font-size:12px;">via Holidays page</span>' : (canEdit ? ('<button class="btn btn-sm btn-danger" onclick="deleteEntryConfirm(\''+e.EntryID+'\');setTimeout(runReport,400)">Delete</button>') : '')) + '</td></tr>';
     });
     area.innerHTML = html + '</tbody></table></div>';
-  });
-  api.getHolidays({from:filters.from, to:filters.to}).then(function(holidays){
-    var area = document.getElementById('holidaysInRange');
-    if (!area) return;
-    area.innerHTML = holidays.length
-      ? ('<div class="section-title">🏖️ Holidays</div><div class="table-wrap" style="margin-bottom:12px;">' + tableize(holidays,['Date','Reason'],['Date','Reason']) + '</div>')
-      : '';
   });
 }
 function exportCSV(rows, name){
@@ -771,27 +823,36 @@ function exportCSV(rows, name){
 
 /* ===================== PARENT PORTAL (no login, read-only) ===================== */
 var parentAllEntries = []; // cached client-side so the date filter needs no extra API calls
-var parentAllHolidays = [];
 function loadParentPortal(studentId){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('floatingActions').classList.add('hidden');
   document.getElementById('parentScreen').classList.remove('hidden');
   var content = document.getElementById('parentContent');
   content.innerHTML = '<div class="empty">Loading student profile…</div>';
-  Promise.all([api.getConfig(), api.getStudentProfile(studentId), api.getHolidays({})]).then(function(res){
-    var cfg = res[0], profile = res[1], holidays = res[2];
+  Promise.all([api.getConfig(), api.getStudentProfile(studentId)]).then(function(res){
+    var cfg = res[0], profile = res[1];
     applyBrandingEverywhere(cfg);
     if (!profile.success){ content.innerHTML = '<div class="empty">'+profile.message+'</div>'; return; }
-    parentAllEntries = profile.entries || [];
-    parentAllHolidays = holidays || [];
+    // holidays are now real per-student entries (Attendance='Holiday'), auto-created when Admin
+    // marks a holiday - so they're already included here in correct chronological order, no
+    // separate fetch/merge needed.
+    parentAllEntries = profile.entries || []; // server returns these newest-first already
 
     var s = profile.student;
     var today = new Date().toISOString().substring(0,10);
     var monthAgo = new Date(Date.now() - 30*86400000).toISOString().substring(0,10);
 
-    var html = '<div class="card parent-hero"><div><h2 style="margin:0 0 4px;">'+s.Name+'</h2>'
-      + '<div style="color:var(--muted);font-size:13px;">Student ID: '+s.StudentID+' • Class '+s.Class+' • Batch '+s.Batch+'</div>'
-      + '<div style="color:var(--muted);font-size:13px;">Teacher: '+(profile.teacherName||'-')+'</div></div>'
+    var html = '<div class="card parent-hero" style="background:linear-gradient(135deg, rgba(27,138,90,.10), rgba(21,101,192,.10));border:2px solid var(--green);">'
+      + '<div style="flex:1;min-width:0;">'
+      + '<h2 style="margin:0 0 8px;">'+s.Name+'</h2>'
+      + infoLine('Student ID', s.StudentID)
+      + infoLine('Class', s.Class + (s.Batch ? ' • Batch '+s.Batch : ''))
+      + infoLine('Parent / Father Name', s.FatherName || '-')
+      + infoLine('Parent Mobile', s.Mobile || '-')
+      + infoLine('Address', s.Address || '-')
+      + infoLine('Teacher', profile.teacherName || '-')
+      + '</div>'
       + '<div class="parent-actions"><button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Print</button>'
       + '<button class="btn btn-blue btn-sm" onclick="window.print()">⬇️ Download PDF</button></div></div>';
 
@@ -808,7 +869,7 @@ function loadParentPortal(studentId){
       + '<button class="btn btn-outline" style="width:auto;align-self:flex-end;" onclick="clearParentFilter()">Show All</button>'
       + '</div>';
 
-    html += '<div class="section-title">📅 Daily Activities & Teacher Remarks</div>'
+    html += '<div class="section-title">📅 Daily Activities & Teacher Remarks (latest first)</div>'
       + '<div class="card table-wrap" id="parentTimelineArea"></div>';
 
     var testMarks = parentAllEntries.filter(function(e){ return e.TestSubject; });
@@ -820,35 +881,43 @@ function loadParentPortal(studentId){
     renderParentTimeline();
   });
 }
+function infoLine(label, value){
+  return '<div style="font-size:13.5px;margin-top:3px;"><b>'+label+':</b> '+value+'</div>';
+}
 function clearParentFilter(){
   document.getElementById('p_From').value = '';
   document.getElementById('p_To').value = '';
   renderParentTimeline();
 }
+function attendanceBadge(att){
+  if (!att) return '-';
+  var cls = att==='Present' ? 'badge-green' : att==='Absent' ? 'badge-red' : att==='Holiday' ? 'badge-blue' : 'badge-yellow';
+  return '<span class="badge '+cls+'">'+(att==='Holiday'?'🏖️ ':'')+att+'</span>';
+}
+function activityBadges(activities){
+  if (!activities || !activities.length) return '-';
+  return activities.map(function(a){
+    // Done=green, Pending=red, Partial=yellow - distinct highlight colors for quick scanning
+    var cls = a.status==='Done' ? 'badge-green' : a.status==='Pending' ? 'badge-red' : a.status==='Partial' ? 'badge-yellow' : 'badge-blue';
+    var label = a.activity + (a.subject ? (' - '+a.subject) : '') + (a.time ? (' ('+a.time+')') : '');
+    return '<span class="badge '+cls+'" style="margin:2px 4px 2px 0;display:inline-block;">'+label+(a.status ? (' • '+a.status) : '')+'</span>';
+  }).join(' ');
+}
 function renderParentTimeline(){
   var from = document.getElementById('p_From').value;
   var to = document.getElementById('p_To').value;
+  // parentAllEntries is already newest-first from the server; filtering preserves that order
   var rows = parentAllEntries.filter(function(e){
     if (from && e.Date < from) return false;
     if (to && e.Date > to) return false;
     return true;
   });
   var timeline = rows.map(function(e){
-    var acts = (e.Activities||[]).map(function(a){
-      return a.activity + (a.subject ? ' - '+a.subject : '') + (a.time ? ' ('+a.time+(a.status?', '+a.status:'')+')' : (a.status ? ' ('+a.status+')' : ''));
-    }).join('; ');
-    return { date:e.Date, attendance:e.Attendance||'-', activities: acts || '-', teacher: e.TeacherName || '-', remarks: e.Observation || '-' };
+    return { date:e.Date, attendance: attendanceBadge(e.Attendance), activities: activityBadges(e.Activities), teacher: e.TeacherName || '-', remarks: e.Observation || '-' };
   });
-  // holidays are global (visible to every student) - merge them into the same timeline
-  var holidayRows = parentAllHolidays.filter(function(h){
-    if (from && h.Date < from) return false;
-    if (to && h.Date > to) return false;
-    return true;
-  }).map(function(h){ return { date:h.Date, attendance:'Holiday', activities:'🏖️ '+h.Reason, teacher:'-', remarks:'-' }; });
-  var merged = timeline.concat(holidayRows).sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
   var area = document.getElementById('parentTimelineArea');
-  area.innerHTML = merged.length
-    ? tableize(merged, ['date','attendance','activities','teacher','remarks'], ['Date','Attendance','Activities Performed','Teacher','Teacher Remarks'])
+  area.innerHTML = timeline.length
+    ? tableize(timeline, ['date','attendance','activities','teacher','remarks'], ['Date','Attendance','Activities Performed','Teacher','Teacher Remarks'])
     : '<div class="empty">No records in this date range</div>';
 }
 </script>
